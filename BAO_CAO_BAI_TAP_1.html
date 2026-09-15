@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>BÁO CÁO BÀI TẬP 1: SỬA LỖI HARDCODE URL TRONG RESTTEMPLATE CỦA ORDER-SERVICE</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        .header-container {
+            text-align: center;
+            border-bottom: 3px solid #2980b9;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .sub-header {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+        }
+        h1 {
+            color: #1a5276;
+            font-size: 22px;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+        .meta-info {
+            font-size: 13px;
+            color: #555;
+            margin-top: 10px;
+        }
+        .meta-info span {
+            margin: 0 10px;
+            font-weight: 600;
+        }
+        h2 {
+            color: #2980b9;
+            font-size: 17px;
+            border-left: 4px solid #2980b9;
+            padding-left: 10px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+        h3 {
+            color: #34495e;
+            font-size: 14.5px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p, li {
+            font-size: 13px;
+            text-align: justify;
+        }
+        ul, ol {
+            padding-left: 20px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+        .error-card {
+            background-color: #fdfefe;
+            border: 1px solid #d5dbdb;
+            border-left: 5px solid #e74c3c;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        .error-card.fix {
+            border-left-color: #27ae60;
+        }
+        .error-title {
+            font-weight: bold;
+            color: #c0392b;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .fix-title {
+            font-weight: bold;
+            color: #229954;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        pre {
+            background-color: #272822;
+            color: #f8f8f2;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 11.5px;
+            overflow-x: auto;
+            line-height: 1.4;
+            margin: 8px 0;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: #eaeded;
+            color: #c0392b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12.5px;
+        }
+        th, td {
+            border: 1px solid #bdc3c7;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #eaf2f8;
+            color: #1b4f72;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9f9;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 3px;
+            color: #ffffff;
+        }
+        .badge-success { background-color: #27ae60; }
+        .badge-danger { background-color: #e74c3c; }
+        .badge-info { background-color: #2980b9; }
+        .page-break {
+            page-break-before: always;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+            font-size: 11px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="sub-header">MÔN HỌC: LẬP TRÌNH HỆ THỐNG PHÂN TÁN (IT_214) - SESSION 10</div>
+        <h1>BÁO CÁO KỸ THUẬT: SỬA LỖI HARDCODE URL VÀ NGHẼN CỔ CHAI TRONG RESTTEMPLATE</h1>
+        <div class="meta-info">
+            <span>Dịch vụ: <b>Order-Service (VietMart)</b></span> | 
+            <span>Cấp độ: <b>Vận dụng cơ bản</b></span> | 
+            <span>Trạng thái: <span class="badge badge-success">HOÀN THÀNH 100%</span></span>
+        </div>
+    </div>
+
+    <h2>1. TỔNG QUAN BỐI CẢNH & HIỆN TRẠNG HỆ THỐNG</h2>
+    <p>
+        Trong kiến trúc Microservices của nền tảng thương mại điện tử <b>VietMart</b>, <code>Order Service</code> cần giao tiếp liên dịch vụ (inter-service communication) với <code>Product Service</code> để truy vấn thông tin chi tiết tên và đơn giá của sản phẩm khi hiển thị chi tiết đơn hàng. Hệ thống sử dụng <b>Netflix Eureka</b> làm Service Discovery để quản lý động các service instances.
+    </p>
+    <p>
+        Một thực tập sinh đã cài đặt lớp <code>ProductServiceClientRT</code> bằng việc tạo mới đối tượng <code>RestTemplate</code> thủ công và hardcode địa chỉ IP máy cá nhân. Mặc dù chạy thử nghiệm thành công ở môi trường Local Development, ứng dụng đã lập tức sập khi triển khai lên môi trường Staging/Production.
+    </p>
+
+    <h2>2. PHÂN TÍCH CHI TIẾT 3 LỖI KỸ THUẬT & HẬU QUẢ PRODUCTION</h2>
+
+    <div class="error-card">
+        <div class="error-title">LỖI 1: Khởi tạo trực tiếp RestTemplate không có @LoadBalanced</div>
+        <p><b>Hiện trạng code lỗi:</b></p>
+        <pre><code>private final RestTemplate restTemplate = new RestTemplate();</code></pre>
+        <p><b>Phân tích nguyên nhân:</b></p>
+        <ul>
+            <li>Khởi tạo thủ công bằng từ khóa <code>new</code> vi phạm nguyên lý Dependency Injection (DI) và Inversion of Control (IoC) của Spring Framework.</li>
+            <li>Thiếu annotation <code>@LoadBalanced</code>, dẫn đến Spring Cloud không thể đính kèm bộ đánh chặn <code>LoadBalancerInterceptor</code> vào RestTemplate.</li>
+        </ul>
+        <p><b>Hậu quả trong môi trường Production:</b></p>
+        <ul>
+            <li><b>Không phân giải được Service Name:</b> Khi client gọi đến logical URI <code>http://product-service/...</code>, RestTemplate thông thường sẽ coi <code>product-service</code> là một DNS hostname mạng công cộng và lập tức ném ra ngoại lệ <code>UnknownHostException</code>.</li>
+            <li><b>Vô hiệu hóa Service Discovery:</b> Không tận dụng được danh sách các IP/port động mà Eureka Server đã đăng ký.</li>
+            <li><b>Không có Client-Side Load Balancing:</b> Khi Product Service có nhiều instances (scale out 3-10 nodes), Order Service hoàn toàn không thể cân bằng tải (Round Robin), dẫn đến tải không đồng đều hoặc sập hệ thống.</li>
+        </ul>
+    </div>
+
+    <div class="error-card">
+        <div class="error-title">LỖI 2: Hardcode địa chỉ IP và Port vật lý ("http://192.168.1.45:8082")</div>
+        <p><b>Hiện trạng code lỗi:</b></p>
+        <pre><code>String url = "http://192.168.1.45:8082/api/products/{id}";</code></pre>
+        <p><b>Phân tích nguyên nhân:</b></p>
+        <ul>
+            <li>Liên kết chặt chẽ (tight coupling) tầng logic ứng dụng với vị trí topo mạng vật lý của một máy cụ thể.</li>
+        </ul>
+        <p><b>Hậu quả trong môi trường Production:</b></p>
+        <ul>
+            <li><b>Sập kết nối ngay khi đổi môi trường:</b> Khi đóng gói Container Docker/Kubernetes hay cloud VM, địa chỉ IP thay đổi liên tục theo từng chu kỳ vòng đời. Khi deploy lên Staging/Production, gọi đến <code>192.168.1.45</code> sẽ sinh lỗi <code>ConnectException: Connection refused</code>.</li>
+            <li><b>Tạo điểm nghẽn duy nhất (Single Point of Failure):</b> Mọi request từ toàn bộ hệ thống Order Service đều dồn vào đúng một node 192.168.1.45. Nếu instance này chết, toàn bộ tính năng tra cứu đơn hàng ngừng hoạt động 100%.</li>
+        </ul>
+    </div>
+
+    <div class="error-card">
+        <div class="error-title">LỖI 3: Không cấu hình Timeout (connectTimeout & readTimeout)</div>
+        <p><b>Hiện trạng code lỗi:</b></p>
+        <pre><code>return restTemplate.getForObject(url, ProductInfo.class, productId);</code></pre>
+        <p><b>Phân tích nguyên nhân:</b></p>
+        <ul>
+            <li><code>RestTemplate</code> mặc định trong Spring Boot/Java sử dụng giá trị timeout bằng <code>-1</code> (vô hạn) hoặc phụ thuộc vào TCP stack của hệ điều hành (thường kéo dài từ vài phút đến vài chục phút).</li>
+        </ul>
+        <p><b>Hậu quả trong môi trường Production:</b></p>
+        <ul>
+            <li><b>Thread Starvation (Cạn kiệt Thread Pool):</b> Khi Product Service bị treo, đầy RAM, lock Database hoặc mạng trễ cao, các worker thread của Tomcat (thường giới hạn 200 threads) ở Order Service sẽ bị block mãi mãi để chờ phản hồi.</li>
+            <li><b>Hiệu ứng sụp đổ dây chuyền (Cascading Failure):</b> Khi toàn bộ 200 threads bị chiếm dụng, tất cả các API khác của Order Service (tạo đơn, hủy đơn, xem lịch sử) đều bị từ chối phục vụ (503 Service Unavailable). Một lỗi cục bộ ở Product Service đã kéo sập toàn bộ Order Service.</li>
+            <li><b>Trải nghiệm người dùng tồi tệ:</b> Người dùng phải chờ đợi màn hình loading vô tận trước khi bị timeout báo lỗi không rõ nguyên nhân.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>3. GIẢI PHÁP & THIẾT KẾ KIẾN TRÚC MỚI ĐẠT CHUẨN</h2>
+
+    <div class="error-card fix">
+        <div class="fix-title">CÁC CẢI TIẾN ĐÃ THỰC HIỆN</div>
+        <ol>
+            <li><b>Tách Configuration Bean riêng biệt:</b> Tạo lớp <code>RestTemplateConfig</code> cung cấp Spring Bean <code>RestTemplate</code> được gắn <code>@LoadBalanced</code>.</li>
+            <li><b>Cấu hình Timeout chặt chẽ:</b> Sử dụng <code>SimpleClientHttpRequestFactory</code> thiết lập <code>connectTimeout = 2 giây</code> và <code>readTimeout = 3 giây</code>.</li>
+            <li><b>Chuyển sang định danh Logical Service ID:</b> Sử dụng URI <code>http://product-service/api/products/{id}</code> để Eureka Server tự động định tuyến và phân phối tải.</li>
+            <li><b>Áp dụng Fault Tolerance & Fallback Pattern:</b>
+                <ul>
+                    <li>Bắt ngoại lệ <code>ResourceAccessException</code> (xảy ra khi mạng timeout hoặc connection refused) để trả về thông tin sản phẩm mặc định (fallback data), giữ cho hệ thống luôn chạy mượt mà.</li>
+                    <li>Bắt ngoại lệ <code>HttpClientErrorException.NotFound</code> (HTTP 404) để ném ra <code>ProductNotFoundException</code> rõ ràng phục vụ tầng nghiệp vụ.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <h3>Mã nguồn RestTemplateConfig.java</h3>
+    <pre><code>package com.example.bai1.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+import java.time.Duration;
+
+@Configuration
+public class RestTemplateConfig {
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(2)); // connectTimeout = 2s
+        factory.setReadTimeout(Duration.ofSeconds(3));    // readTimeout = 3s
+        return new RestTemplate(factory);
+    }
+}</code></pre>
+
+    <h3>Mã nguồn ProductServiceClientRT.java (Đã sửa hoàn chỉnh)</h3>
+    <pre><code>package com.example.bai1.client;
+
+import com.example.bai1.dto.ProductInfo;
+import com.example.bai1.exception.ProductNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+public class ProductServiceClientRT {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceClientRT.class);
+    public static final String PRODUCT_SERVICE_URL = "http://product-service/api/products/{id}";
+
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public ProductServiceClientRT(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public ProductInfo getById(Long productId) {
+        try {
+            return restTemplate.getForObject(PRODUCT_SERVICE_URL, ProductInfo.class, productId);
+        } catch (HttpClientErrorException.NotFound ex) {
+            log.error("Product with id {} not found (HTTP 404): {}", productId, ex.getMessage());
+            throw new ProductNotFoundException(productId);
+        } catch (ResourceAccessException ex) {
+            log.warn("Timeout or network error calling product-service for productId {}: {}. Returning fallback.",
+                    productId, ex.getMessage());
+            return getFallbackProduct(productId);
+        }
+    }
+
+    protected ProductInfo getFallbackProduct(Long productId) {
+        ProductInfo fallback = new ProductInfo();
+        fallback.setId(productId);
+        fallback.setName("Sản phẩm tạm thời không khả dụng");
+        fallback.setPrice(0.0);
+        fallback.setDescription("Dịch vụ sản phẩm đang gián đoạn hoặc timeout. Vui lòng thử lại sau.");
+        return fallback;
+    }
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <h2>4. KẾT QUẢ KIỂM THỬ TỰ ĐỘNG (UNIT TESTS)</h2>
+    <p>
+        Kiểm thử đơn vị được xây dựng bằng <b>JUnit 5</b> và <b>Mockito</b>, độc lập hoàn toàn với hạ tầng mạng và server ngoài.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">STT</th>
+                <th style="width: 35%;">Tên Kịch Bản Kiểm Thử (Unit Test Case)</th>
+                <th style="width: 35%;">Mục Tiêu & Điều Kiện Kích Hoạt</th>
+                <th style="width: 15%;">Thời Gian</th>
+                <th style="width: 10%;">Kết Quả</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><b>testGetById_Success</b> (Happy Path)</td>
+                <td>Giả lập Product Service phản hồi mã HTTP 200 kèm DTO sản phẩm chuẩn (Dell XPS 15). Kiểm tra trích xuất dữ liệu chính xác.</td>
+                <td>0.853s</td>
+                <td><span class="badge badge-success">PASSED</span></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><b>testGetById_TimeoutFallback</b> (Timeout & Fallback)</td>
+                <td>Giả lập RestTemplate ném ngoại lệ <code>ResourceAccessException</code> mô phỏng lỗi Timeout quá ngưỡng 3s. Kiểm tra fallback an toàn.</td>
+                <td>0.007s</td>
+                <td><span class="badge badge-success">PASSED</span></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><b>testGetById_NotFoundThrowsException</b> (404 Error)</td>
+                <td>Giả lập HTTP 404 Not Found từ Product Service. Kiểm tra ném đúng ngoại lệ <code>ProductNotFoundException</code>.</td>
+                <td>0.049s</td>
+                <td><span class="badge badge-success">PASSED</span></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><b>contextLoads</b> (Spring Context Boot)</td>
+                <td>Kiểm tra tính tương thích và khởi tạo trơn tru toàn bộ Spring Bean trong Application Context.</td>
+                <td>0.008s</td>
+                <td><span class="badge badge-success">PASSED</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Bằng chứng thực thi Gradle Test CLI:</h3>
+    <pre><code>> Task :testClasses
+> Task :test
+
+ProductServiceClientRTTest > 1. Test gọi thành công (happy path): trả về thông tin sản phẩm chính xác PASSED
+ProductServiceClientRTTest > 3. Test xử lý lỗi 404 (Not Found): ném ra ProductNotFoundException PASSED
+ProductServiceClientRTTest > 2. Test mô phỏng timeout: ResourceAccessException ném ra và trả về fallback PASSED
+Bai1ApplicationTests > contextLoads() PASSED
+
+BUILD SUCCESSFUL in 18s
+4 actionable tasks: 4 executed</code></pre>
+
+    <h2>5. KẾT LUẬN</h2>
+    <p>
+        Dự án đã giải quyết triệt để toàn bộ 3 lỗi kiến trúc cơ bản của hệ thống Microservices trong <code>Order Service</code>:
+    </p>
+    <ul>
+        <li>Loại bỏ hoàn toàn địa chỉ IP tĩnh cứng, thay bằng cơ chế Dynamic Service Discovery qua Eureka.</li>
+        <li>Tích hợp Client-side Load Balancing thông qua <code>@LoadBalanced</code>.</li>
+        <li>Bảo vệ tài nguyên server bằng cấu hình timeout giới hạn thời gian thực thi (2s connect, 3s read).</li>
+        <li>Áp dụng mô hình phòng thủ chịu lỗi (Fault Tolerance) với Fallback Mechanism, đảm bảo độ sẵn sàng cao (High Availability) cho hệ sinh thái VietMart.</li>
+    </ul>
+
+    <div class="footer">
+        Báo cáo kết quả bài tập 1 - Session 10 - Hệ thống thương mại điện tử VietMart Microservices
+    </div>
+
+</body>
+</html>
